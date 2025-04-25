@@ -1,0 +1,62 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>لیست تراکنش‌ها</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <h1 class="text-center text-primary mb-4">📊 لیست تراکنش‌ها</h1>
+    <div class="card shadow-sm p-4">
+        <h4 class="text-success">💰 درآمد کل: {{ total_income|default:0|intcomma }}</h4>
+        <h4 class="text-danger">💸 هزینه کل: {{ total_expense|default:0|intcomma }}</h4>
+        <h4 class="text-info">⚖️ موجودی کل: {{ balance|default:0|intcomma }}</h4>
+    </div>
+
+    <!-- دکمه ثبت تراکنش -->
+    <div class="text-center mt-3">
+        <a href="{% url 'add_transaction' %}" class="btn btn-success btn-lg">+ ثبت تراکنش جدید</a>
+    </div>
+
+    <div class="card shadow-sm p-4 mt-3">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+            <tr>
+                <th>تاریخ</th>
+                <th>عنوان</th>
+                <th>نوع</th>
+                <th>دسته‌بندی</th>
+                <th>مقدار</th>
+                <th>عملیات</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.created_at|date:"j F Y، H:i" }}</td>
+                <td>{{ transaction.title }}</td>
+                <td class="{% if transaction.transaction_type == 'INCOME' %}text-success{% else %}text-danger{% endif %}">
+                    {{ transaction.transaction_type }}
+                </td>
+                <td>{{ transaction.category.name|default:"بدون دسته‌بندی" }}</td>
+                <td>{{ transaction.amount|default:0|intcomma }}</td>
+                <td>
+                    <a href="{% url 'edit_transaction' transaction.id %}"
+                       class="btn btn-outline-primary btn-sm">ویرایش</a>
+                    <a href="{% url 'delete_transaction' transaction.id %}"
+                       class="btn btn-outline-danger btn-sm">حذف</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- دکمه‌های دسترسی سریع -->
+    <div class="text-center mt-4">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-lg">🏠 بازگشت به داشبورد</a>
+    </div>
+</div>
+</body>
+</html>

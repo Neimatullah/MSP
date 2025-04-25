@@ -1,0 +1,42 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>گزارش دسته‌بندی</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <h1 class="text-center text-primary mb-4">📊 گزارش دسته‌بندی تراکنش‌ها</h1>
+    <div class="text-center mb-4">
+        <a href="{% url 'transaction_list' %}" class="btn btn-secondary">بازگشت به لیست</a>
+    </div>
+    <div class="card shadow-sm p-4">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+            <tr>
+                <th>دسته</th>
+                <th>درآمد کل</th>
+                <th>هزینه کل</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for cat in categories %}
+            <tr>
+                <td>{{ cat.name }}</td>
+                <td>{{ cat.total_income|default:0|intcomma }}</td>
+                <td>{{ cat.total_expense|default:0|intcomma }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card shadow-sm p-4 mt-4">
+        <h3 class="text-success">💰 جمع کل درآمد: {{ total_income|default:0|intcomma }}</h3>
+        <h3 class="text-danger">💸 جمع کل هزینه: {{ total_expense|default:0|intcomma }}</h3>
+        <h3 class="text-info">⚖️ بیلانس: {{ balance|default:0|intcomma }}</h3>
+    </div>
+</div>
+</body>
+</html>
