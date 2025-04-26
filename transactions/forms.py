@@ -1,5 +1,15 @@
 from django import forms
 from .models import Transaction, Category, Fund, Ledger
+from django.contrib.auth.models import User
+
+
+class AddUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password', 'is_staff']
+        widgets = {
+            'password': forms.PasswordInput(),
+        }
 
 
 class TransactionForm(forms.ModelForm):

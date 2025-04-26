@@ -1,9 +1,32 @@
 {% load humanize %}
 <!DOCTYPE html>
-<html>
+<html lang="fa" dir="rtl">
 <head>
     <title>لیست صندوق‌ها</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Vazir, sans-serif; /* افزودن فونت فارسی */
+            direction: rtl;
+            background-color: #f8f9fa;
+        }
+        .table th, .table td {
+            text-align: center; /* راست‌چین کردن متن جدول */
+        }
+        .table th {
+            background-color: #007bff; /* رنگ آبی برای هدر جدول */
+            color: #ffffff;
+        }
+        .btn-sm {
+            font-size: 14px; /* اندازه متن کوچک‌تر دکمه‌ها */
+        }
+        .btn-lg {
+            font-size: 18px; /* دکمه‌های بزرگ‌تر */
+        }
+        .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #f9f9f9; /* رنگ متفاوت برای ردیف‌های زوج */
+        }
+    </style>
 </head>
 <body class="bg-light">
 <div class="container mt-5">
@@ -11,20 +34,24 @@
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
         <tr>
+            <th>شماره مسلسل</th>
             <th>نام صندوق</th>
             <th>ارز</th>
             <th>موجودی</th>
             <th>توضیحات</th>
+            <th>تاریخ و ساعت</th>
             <th>عملیات</th>
         </tr>
         </thead>
         <tbody>
         {% for fund in funds %}
         <tr>
+            <td>{{ forloop.counter }}</td> <!-- شماره مسلسل بر اساس ردیف -->
             <td>{{ fund.name }}</td>
             <td>{{ fund.currency }}</td>
-            <td>{{ fund.balance|default:0|intcomma }}</td>
+            <td>{{ fund.calculated_balance|default:0|intcomma }}</td> <!-- موجودی محاسبه‌شده -->
             <td>{{ fund.description|default:"-" }}</td>
+            <td>{{ fund.created_at|date:"Y-m-d H:i" }}</td> <!-- تاریخ و ساعت -->
             <td>
                 <a href="{% url 'ledger_list' fund.id %}" class="btn btn-primary btn-sm">مشاهده تراکنش‌ها</a>
                 <a href="{% url 'add_ledger' fund.id %}" class="btn btn-success btn-sm">ثبت تراکنش</a>

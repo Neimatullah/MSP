@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
+from django.conf.global_settings import LOGOUT_REDIRECT_URL
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-pe3q@%zos(f=1m*8iw^)x^pzn9bn*h5c5y&5ofqvo3p2-skg#y'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['neimatullah.pythonanywhere.com']
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -109,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGIN_URL = '/login/'
 LOGOUT_URL = '/logout/'
 LOGIN_REDIRECT_URL = '/dashboard/'  # پس از ورود کاربر، به صفحه اصلی هدایت می‌شود
-
+LOGOUT_REDIRECT_URL = '/'
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 

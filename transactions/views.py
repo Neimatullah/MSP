@@ -9,12 +9,38 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.contrib.auth import logout
+from .forms import AddUserForm
+from persiantools.jdatetime import JalaliDateTime
 
+
+def ledger_view(request, fund_id):
+    transactions = Transaction.objects.filter(fund_id=fund_id).order_by('-created_at')
+    for transaction in transactions:
+        transaction.created_at_jalali = JalaliDateTime(transaction.created_at).strftime('%A، %d %B %Y، %H:%M')
+
+    context = {
+        'fund': Fund.objects.get(id=fund_id),
+        'transactions': transactions,
+    }
+    return render(request, 'ledger.html', context)
+
+
+def add_user(request):
+    if request.method == 'POST':
+        form = AddUserForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            return redirect('manage_users')  # هدایت به لیست کاربران
+    else:
+        form = AddUserForm()
+    return render(request, 'add_user.html', {'form': form})
 
 
 def custom_logout(request):
-    logout(request)  # کاربر را لاگ‌اوت می‌کند
-    return redirect('/login/')  # هدایت به صفحه لاگین
+    logout(request)  # کاربر را از سیستم خارج می‌کند
+    return redirect('login')  # هدایت به صفحه لاگین
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -174,8 +200,16 @@ def add_fund(request):
 
 
 def fund_list(request):
-    funds = Fund.objects.all()  # دریافت لیست تمام صندوق‌ها
-    context = {'funds': funds}  # اضافه کردن داده‌ها به کانتکست
+    # محاسبه موجودی بر اساس تراکنش‌ها
+    funds = Fund.objects.annotate(
+        total_receive=Sum('transactions__amount', filter=Q(transactions__transaction_type='RECEIVE')),
+        total_pay=Sum('transactions__amount', filter=Q(transactions__transaction_type='PAY')),
+        calculated_balance=(
+                Sum('transactions__amount', filter=Q(transactions__transaction_type='RECEIVE')) -
+                Sum('transactions__amount', filter=Q(transactions__transaction_type='PAY'))
+        )
+    )
+    context = {'funds': funds}  # ارسال صندوق‌ها و موجودی محاسبه‌شده به قالب
     return render(request, 'transactions/fund_list.html', context)
 
 
@@ -238,7 +272,10 @@ def dashboard(request):
         total_income = transactions.filter(transaction_type='INCOME').aggregate(Sum('amount'))['amount__sum'] or 0
         total_expense = transactions.filter(transaction_type='EXPENSE').aggregate(Sum('amount'))['amount__sum'] or 0
         balance = total_income - total_expense
-
+        # محاسبه درصدها
+        income_progress = (total_income / (total_income + total_expense)) * 100
+        expense_progress = (total_expense / (total_income + total_expense)) * 100
+        balance_progress = (balance / total_income) * 100
     # ایجاد کانتکست برای قالب
     context = {
         'categories': categories,
@@ -288,14 +325,14 @@ def transaction_list(request):
     if category_id:
         transactions = transactions.filter(category_id=category_id)
 
-    total_income = transactions.filter(transaction_type='INCOME').aggregate(Sum('amount'))['amount__sum'] or 0
-    total_expense = transactions.filter(transaction_type='EXPENSE').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_income = transactions.filter(transaction_type='RECEIVE').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_expense = transactions.filter(transaction_type='PAY').aggregate(Sum('amount'))['amount__sum'] or 0
     total_balance = total_income - total_expense
 
     context = {
         'transactions': transactions,
-        'total_income': total_income,
-        'total_expense': total_expense,
+        'total_receive': total_income,
+        'total_pay': total_expense,
         'balance': total_balance,
         'start_date': start_date,
         'end_date': end_date,
@@ -307,7 +344,7 @@ def transaction_list(request):
 # لیست تراکنش‌های صندوق
 def ledger_list(request, fund_id):
     fund = get_object_or_404(Fund, id=fund_id)
-    transactions = fund.transactions.filter(is_archived=False).order_by('-created_at')
+    transactions = fund.transactions.filter(is_archived=False).order_by('created_at')  # ترتیب صعودی
 
     # دریافت پارامترهای جستجو و فیلتر
     search_query = request.GET.get('search_query', '')
@@ -325,9 +362,19 @@ def ledger_list(request, fund_id):
     if end_date:
         transactions = transactions.filter(created_at__date__lte=end_date)
 
+    # محاسبه بیلانس برای هر تراکنش
+    balance = 0
+    for transaction in transactions:
+        if transaction.transaction_type == 'RECEIVE':
+            balance += transaction.amount
+        elif transaction.transaction_type == 'PAY':
+            balance -= transaction.amount
+        transaction.balance = balance  # مقدار بیلانس به تراکنش اضافه می‌شود
+
+    # مجموع دریافت‌ها و پرداخت‌ها
     total_receive = transactions.filter(transaction_type='RECEIVE').aggregate(Sum('amount'))['amount__sum'] or 0
     total_pay = transactions.filter(transaction_type='PAY').aggregate(Sum('amount'))['amount__sum'] or 0
-    balance = total_receive - total_pay
+    fund.balance = total_receive - total_pay  # محاسبه موجودی کل
 
     context = {
         'fund': fund,
@@ -337,7 +384,6 @@ def ledger_list(request, fund_id):
         'end_date': end_date,
         'total_receive': total_receive,
         'total_pay': total_pay,
-        'balance': balance,
     }
     return render(request, 'transactions/ledger_list.html', context)
 

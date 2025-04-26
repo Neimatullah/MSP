@@ -1,24 +1,63 @@
-{% load humanize %}
 <!DOCTYPE html>
-<html>
+<html lang="fa" dir="rtl">
 <head>
-    <title>ثبت تراکنش جدید</title>
+    <title>ثبت تراکنش</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Vazir, sans-serif; /* افزودن فونت فارسی */
+            direction: rtl;
+            text-align: right;
+            background-color: #f8f9fa;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .btn-lg {
+            font-size: 18px;
+        }
+        .description-input {
+            height: 100px; /* کوچک کردن ارتفاع خانه دیسکریپشن */
+            resize: none; /* جلوگیری از تغییر اندازه توسط کاربر */
+        }
+        .form-label {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body class="bg-light">
 <div class="container mt-5">
-    <h1 class="text-center text-primary mb-4">➕ ثبت تراکنش جدید برای {{ fund.name }}</h1>
-    <div class="card shadow-sm p-4">
+    <h1 class="text-center text-primary mb-4">ثبت تراکنش جدید</h1>
+    <div class="card shadow-sm">
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
+            <!-- فیلدهای فرم -->
+            <div class="mb-3">
+                <label for="serial_number" class="form-label">شماره مسلسل:</label>
+                <input type="text" name="serial_number" id="serial_number" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="transaction_type" class="form-label">نوع تراکنش:</label>
+                <select name="transaction_type" id="transaction_type" class="form-select">
+                    <option value="RECEIVE">دریافت</option>
+                    <option value="PAY">پرداخت</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="amount" class="form-label">مبلغ:</label>
+                <input type="number" name="amount" id="amount" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">توضیحات:</label>
+                <textarea name="description" id="description" class="form-control description-input"></textarea>
+            </div>
+            <!-- دکمه ذخیره -->
             <div class="text-center mt-3">
                 <button type="submit" class="btn btn-success btn-lg">ذخیره</button>
             </div>
         </form>
-    </div>
-    <div class="text-center mt-4">
-        <a href="{% url 'ledger_list' fund.id %}" class="btn btn-secondary">بازگشت</a>
     </div>
 </div>
 </body>

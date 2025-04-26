@@ -61,39 +61,67 @@
     <!-- سربرگ داشبورد -->
     <div class="dashboard-header">
         <h1>📊 داشبورد مدیریت مالی</h1>
-        <p>تاریخ امروز: {{ now|date:"l, d F Y" }}</p>
+        <p>
+            تاریخ امروز:
+            <strong>{{ now|date:"l, d F Y" }}</strong>
+        </p>
     </div>
 
-    <!-- خلاصه مالی -->
+
+    <!-- خلاصه مالی بهبود یافته -->
     <div class="row text-center mt-4">
         <div class="col-md-4">
-            <div class="card bg-success text-white">
+            <div class="card">
                 <div class="card-body">
-                    <h3>{{ total_income|default:0|intcomma }}</h3>
+                    <h3 class="text-success">{{ total_income|default:0|intcomma }}</h3>
                     <p>درآمد کل</p>
-                    <p>درصد رشد درآمد: {{ progress_percentage|default:"0.00" }}٪</p>
+                    <div class="progress" style="height: 20px; border-radius: 10px;">
+                        <div class="progress-bar bg-success" role="progressbar"
+                             style="width: {{ income_progress }}%;"
+                             aria-valuenow="{{ income_progress }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                            {{ income_progress }}%
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card bg-danger text-white">
+            <div class="card">
                 <div class="card-body">
-                    <h3>{{ total_expense|default:0|intcomma }}</h3>
+                    <h3 class="text-danger">{{ total_expense|default:0|intcomma }}</h3>
                     <p>هزینه کل</p>
-                    <p>درصد رشد هزینه: {{ expense_growth|default:"0.00" }}٪</p>
+                    <div class="progress" style="height: 20px; border-radius: 10px;">
+                        <div class="progress-bar bg-danger" role="progressbar"
+                             style="width: {{ expense_progress }}%;"
+                             aria-valuenow="{{ expense_progress }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                            {{ expense_progress }}%
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card bg-info text-white">
+            <div class="card">
                 <div class="card-body">
-                    <h3>{{ balance|default:0|intcomma }}</h3>
+                    <h3 class="text-info">{{ balance|default:0|intcomma }}</h3>
                     <p>موجودی کل</p>
+                    <div class="progress" style="height: 20px; border-radius: 10px;">
+                        <div class="progress-bar bg-info" role="progressbar"
+                             style="width: {{ balance_progress }}%;"
+                             aria-valuenow="{{ balance_progress }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                            {{ balance_progress }}%
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
     <!-- فرم فیلتر -->
     <form method="GET" class="filter-form mt-4">
         <div class="row">
