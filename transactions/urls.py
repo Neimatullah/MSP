@@ -35,4 +35,7 @@ urlpatterns = [
 
     # خروج
     path('logout/', custom_logout, name='logout'),
+
+    path('signup/', views.signup, name='signup'),
+    # مسیرهای دیگر...
 ]

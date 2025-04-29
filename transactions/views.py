@@ -13,6 +13,10 @@ from .forms import AddUserForm
 from persiantools.jdatetime import JalaliDateTime
 
 
+def signup(request):
+    return render(request, 'signup.html')
+
+
 def ledger_view(request, fund_id):
     transactions = Transaction.objects.filter(fund_id=fund_id).order_by('-created_at')
     for transaction in transactions:

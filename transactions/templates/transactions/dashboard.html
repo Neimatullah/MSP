@@ -55,6 +55,22 @@
             margin: 5px;
         }
     </style>
+    {% load static %}
+    <style>
+        body {
+            background: url('{% static "cover.png" %}') no-repeat center center fixed;
+            background-size: contain; /* تصویر به اندازه واقعی نمایش داده می‌شود */
+            background-position: center; /* موقعیت تصویر را تنظیم می‌کند */
+            color: #fff; /* متن سفید برای خوانایی بهتر */
+        }
+    </style>
+    <style>
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{% static "cover.png" %}') no-repeat center center fixed;
+            background-size: contain;
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-4">

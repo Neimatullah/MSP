@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ایجاد حساب کاربری</title>
+</head>
+<body>
+    <h1>ایجاد حساب کاربری</h1>
+    <form method="post">
+        {% csrf_token %}
+        <!-- فیلدهای فرم ثبت‌نام -->
+        <input type="text" name="username" placeholder="نام کاربری">
+        <input type="password" name="password" placeholder="رمز عبور">
+        <button type="submit">ثبت‌نام</button>
+    </form>
+</body>
+</html>

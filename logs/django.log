@@ -1,0 +1,4 @@
+import logging
+
+logger = logging.getLogger('django')
+logger.debug('This is a debug message for testing logs.')
